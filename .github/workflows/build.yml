@@ -13,11 +13,14 @@ on:
         required: true
         type: string
     secrets:
-      aws_access_key:
+      aws_access_key_id:
         required: true
       aws_secret_access_key:
         required: true
       aws_region:
+        required: true
+      aws_bucket:
+        required: true
 
       harbor_secret:
         required: true
@@ -83,24 +86,35 @@ jobs:
         mkdir artifact
         LOCALARCH=$(uname -m | sed s/aarch64/arm64/)
         cp build/${{ inputs.unikernel }}_${{ inputs.hypervisor }}-$LOCALARCH artifact/${{ inputs.unikernel }}_${{ inputs.hypervisor }}-${{ inputs.matrix}}
+        pwd
+        echo "GitHub WorkSpace: ${{ github.workspace }}"
         ls -lacrt artifact
 
-    - name: Upload packaged artifact to AWS S3
+    - name: Set up AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: Upload artifacts to S3
+    - name: Upload artifacts to GitHub Storage
       uses: actions/upload-artifact@v2
       with:
         name: my-artifact
-        path: /github/workspace/artifact/${{ inputs.unikernel }}_${{ inputs.hypervisor }}-${{ inputs.matrix }}
+        path: ${{ github.workspace }}/artifact/${{ inputs.unikernel }}_${{ inputs.hypervisor }}-${{ inputs.matrix }}
+        retention-days: 1
 
-    - name: Sync artifacts to S3 bucket
-      run: |
-        aws s3 sync ${{ github.workspace }}/my-artifact s3://bima --delete    
+    - name: Upload to S3 bucket
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl public-read --follow-symlinks --delete
+      env:
+        AWS_S3_BUCKET: ${{ secrets.AWS_BUCKET }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        SOURCE_DIR: '${{  github.workspace }}/artifact'
+        DEST_DIR: 'bima-${{ inputs.hypervisor }}-${{ inputs.matrix }}'
 
 #  buildimage:
 #    runs-on: [self-hosted, "${{ inputs.matrix}}"]

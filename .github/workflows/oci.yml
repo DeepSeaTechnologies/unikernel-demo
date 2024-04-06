@@ -36,9 +36,10 @@ jobs:
       unikernel: ${{ matrix.unikernel }}
       hypervisor: ${{ matrix.hypervisor }}
     secrets:
-      aws_access_key: ${{ secrets.AWS_ACCESS_KEY}}
-      aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-      aws_region: ${{ secrets.AWS_REGION}}
+      aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      aws_region: ${{ secrets.AWS_REGION }}
+      aws_bucket: ${{ secrets.AWS_BUCKET }}
       harbor_user: ${{ secrets.HARBOR_USER }}
       harbor_secret: ${{ secrets.HARBOR_SECRET }}
 
