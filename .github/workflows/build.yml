@@ -85,6 +85,7 @@ jobs:
         make -j $(nproc)
         mkdir artifact
         LOCALARCH=$(uname -m | sed s/aarch64/arm64/)
+        ls -lacrt build/
         cp build/${{ inputs.unikernel }}_${{ inputs.hypervisor }}-$LOCALARCH artifact/${{ inputs.unikernel }}_${{ inputs.hypervisor }}-${{ inputs.matrix}}
         pwd
         echo "GitHub WorkSpace: ${{ github.workspace }}"
@@ -130,63 +131,68 @@ jobs:
     steps:
     - name: Download bima
       run: |
-        curl -L -o /tmp/bima https://bima-unikernel.s3.amazonaws.com/bima-${{ inputs.hypervisor }}-${{ inputs.matrix }}/${{ inputs.unikernel }}_${{ inputs.hypervisor }}-${{ inputs.matrix }}
+        curl -L -o /tmp/bima https://s3.nubificus.co.uk/nbfc-assets/github/bima/dist/dba2fe43b3606687bf0ee08a4a57f41e3d2cf052/${{ inputs.matrix }}/bima_${{ inputs.matrix }}
     
-#    - name: Make bima executable
-#      run: |
-#        ls -la /tmp/bima
-#        ls -la /tmp/
-#        chmod +x /tmp/bima 
-#        mv /tmp/bima /usr/local/bin/bima
-#
-#    - name: Setup params
-#      shell: bash
-#      run: |
-#        if [[ "${{inputs.hypervisor}}" != "fc" ]]
-#        then
-#          echo "HYPERVISOR=${{ inputs.hypervisor }}" >> $GITHUB_ENV
-#          echo "cmdlineparam=" >> $GITHUB_ENV
-#        else
-#          echo "HYPERVISOR=firecracker" >> $GITHUB_ENV
-#          echo "cmdlineparam=\"mydummyapp mydummyoption\"" >> $GITHUB_ENV
-#        fi
-#
-#        echo "hypervisor: ${{ env.HYPERVISOR }}"
-#        echo "cmdline: ${{ env.cmdlineparam }}"
-#
-#
-#
-#    - name: Start containerd service
-#      run: systemctl enable containerd.service --now
-#
-#    - name: Prepare image
-#      run: |
-#        cd /tmp && mkdir -p job && cd job
-#        curl -L -o ${{ inputs.unikernel }}_${{ inputs.hypervisor }}-${{ inputs.matrix }} https://s3.nubificus.co.uk/bima/${{ inputs.matrix }}/${{ inputs.unikernel }}_${{ inputs.hypervisor }}-${{ inputs.matrix }}/${{ inputs.unikernel }}_${{ inputs.hypervisor }}-${{ inputs.matrix }}
-#
-#        echo "hypervisor: ${{ env.HYPERVISOR }}"
-#        echo "cmdline: ${{ env.cmdlineparam }}"
-#
-#        tee Containerfile > /dev/null <<EOT
-#        FROM scratch
-#        COPY ${{ inputs.unikernel }}_${{ inputs.hypervisor}}-${{ inputs.matrix }} /unikernel/httpreply-unikraft
-#        LABEL "com.urunc.unikernel.binary"="/unikernel/httpreply-unikraft"
-#        LABEL "com.urunc.unikernel.cmdline"=${{ env.cmdlineparam }}
-#        LABEL "com.urunc.unikernel.unikernelType"="unikraft"
-#        LABEL "com.urunc.unikernel.hypervisor"=${{ env.HYPERVISOR }}
-#        EOT
-#
-#    - name: Build image
-#      id: build-image
-#      #continue-on-error: true
-#      run: |
-#        TAGS=harbor.nbfc.io/nubificus/${{ inputs.unikernel }}-${{inputs.hypervisor}}:${{ inputs.matrix }}
-#        HASH=$(bima build -t $TAGS -f /tmp/job/Containerfile /tmp/job)
-#        echo $HASH
-#        echo "======================"
-#        ctr image push $TAGS -u 'robot$unikraft:0jPGUiOCyvlJyBpTu51zI1ET17U9oSMd'
-#        echo "hash=$HASH" >> $GITHUB_OUTPUT
-#        echo "tags=$TAGS" >> $GITHUB_OUTPUT
+    - name: Make bima executable
+      run: |
+        ls -la /tmp/bima
+        ls -la /tmp/
+        chmod +x /tmp/bima
+        mv /tmp/bima /usr/local/bin/bima
+
+    - name: Setup params
+      shell: bash
+      run: |
+        if [[ "${{inputs.hypervisor}}" != "fc" ]]
+        then
+          echo "HYPERVISOR=${{ inputs.hypervisor }}" >> $GITHUB_ENV
+          echo "cmdlineparam=" >> $GITHUB_ENV
+        else
+          echo "HYPERVISOR=firecracker" >> $GITHUB_ENV
+          echo "cmdlineparam=\"mydummyapp mydummyoption\"" >> $GITHUB_ENV
+        fi
+    
+        if [[ -n "${{ env.HYPERVISOR }}" ]]
+        then
+          echo "hypervisor: ${{ env.HYPERVISOR }}"
+        fi
+    
+        if [[ -n "${{ env.cmdlineparam }}" ]]
+        then
+          echo "cmdline: ${{ env.cmdlineparam }}"
+        fi
+
+    - name: Start containerd service
+      run: systemctl enable containerd.service --now
+
+    - name: Prepare image
+      run: |
+        cd /tmp && mkdir -p job && cd job
+        curl -L -o ${{ inputs.unikernel }}_${{ inputs.hypervisor }}-${{ inputs.matrix }} https://bima-unikernel.s3.amazonaws.com/bima-${{ inputs.hypervisor }}-${{ inputs.matrix }}/${{ inputs.unikernel }}_${{ inputs.hypervisor }}-${{ inputs.matrix }}
+
+        echo "hypervisor: ${{ env.HYPERVISOR }}"
+        echo "cmdline: ${{ env.cmdlineparam }}"
+
+        tee Containerfile > /dev/null <<EOT
+        FROM scratch
+        COPY ${{ inputs.unikernel }}_${{ inputs.hypervisor}}-${{ inputs.matrix }} /unikernel/httpreply-unikraft
+        LABEL "com.urunc.unikernel.binary"="/unikernel/httpreply-unikraft"
+        LABEL "com.urunc.unikernel.cmdline"=${{ env.cmdlineparam }}
+        LABEL "com.urunc.unikernel.unikernelType"="unikraft"
+        LABEL "com.urunc.unikernel.hypervisor"=${{ env.HYPERVISOR }}
+        EOT
+
+    - name: Build image
+      id: build-image
+      #continue-on-error: true
+      run: |
+        TAGS=c8n.io/bmutziu/${{ inputs.unikernel }}-${{inputs.hypervisor}}:${{ inputs.matrix }}
+        HASH=$(bima build -t $TAGS -f /tmp/job/Containerfile /tmp/job)
+        echo $HASH
+        echo "##################################################"
+        ctr image push $TAGS -u '${{ secrets.harbor_user }}:${{ secrets.HARBOR_SECRET }}'
+        echo "hash=$HASH" >> $GITHUB_OUTPUT
+        echo "tags=$TAGS" >> $GITHUB_OUTPUT
 
 #  sign:
 #    runs-on: [self-hosted, "${{ inputs.matrix }}" ]
