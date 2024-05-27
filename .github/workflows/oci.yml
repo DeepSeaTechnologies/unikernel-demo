@@ -12,6 +12,7 @@ on:
 permissions:
   id-token: write # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
+  packages: write
 
 
 jobs:
@@ -42,6 +43,8 @@ jobs:
       aws_bucket: ${{ secrets.AWS_BUCKET }}
       harbor_user: ${{ secrets.HARBOR_USER }}
       harbor_secret: ${{ secrets.HARBOR_SECRET }}
+      cosign_private_key: ${{ secrets.COSIGN_PRIVATE_KEY }}
+      cosign_password: ${{ secrets.COSIGN_PASSWORD }}
 
 
 #  manifest:
