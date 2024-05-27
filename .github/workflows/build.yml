@@ -116,23 +116,22 @@ jobs:
         SOURCE_DIR: '${{  github.workspace }}/artifact'
         DEST_DIR: 'bima-${{ inputs.hypervisor }}-${{ inputs.matrix }}'
 
-#  buildimage:
-#    runs-on: ubuntu-latest
-#    needs: [buildunikernel]
-#    container:
-#      image: harbor.nbfc.io/nubificus/bima-test:latest
-#      options: --privileged -e GITHUB_ENV -e GITHUB_OUTPUT -e GITHUB_PATH -e GITHUB_STATE -e GITHUB_STEP_SUMMARY
-#
-#
-#    outputs:
-#      hash: ${{ steps.build-image.outputs.hash }}
-#      tags: ${{ steps.build-image.outputs.tags }}
-#    
-#    steps:
-#    - name: Download bima
-#      run: |
-#        curl -L -o /tmp/bima https://s3.nubificus.co.uk/nbfc-assets/github/bima/dist/dba2fe43b3606687bf0ee08a4a57f41e3d2cf052/${{ inputs.matrix }}/bima_${{ inputs.matrix }}
-#    
+  buildimage:
+    runs-on: ubuntu-latest
+    needs: [buildunikernel]
+    container:
+      image: harbor.nbfc.io/nubificus/bima-test:latest
+      options: --privileged -e GITHUB_ENV -e GITHUB_OUTPUT -e GITHUB_PATH -e GITHUB_STATE -e GITHUB_STEP_SUMMARY
+
+    outputs:
+      hash: ${{ steps.build-image.outputs.hash }}
+      tags: ${{ steps.build-image.outputs.tags }}
+    
+    steps:
+    - name: Download bima
+      run: |
+        curl -L -o /tmp/bima https://bima-unikernel.s3.amazonaws.com/bima-${{ inputs.hypervisor }}-${{ inputs.matrix }}/${{ inputs.unikernel }}_${{ inputs.hypervisor }}-${{ inputs.matrix }}
+    
 #    - name: Make bima executable
 #      run: |
 #        ls -la /tmp/bima
