@@ -47,16 +47,18 @@ jobs:
       cosign_password: ${{ secrets.COSIGN_PASSWORD }}
 
 
-#  manifest:
-#    needs: [build]
-#    uses: ./.github/workflows/manifest.yml
-#    strategy:
-#      matrix:
-#        unikernel: [ httpreply ]
-#        hypervisor: [ qemu, fc]
-#    with:
-#      unikernel: ${{ matrix.unikernel }}
-#      hypervisor: ${{ matrix.hypervisor }}
-#    secrets:
-#      harbor_user: ${{ secrets.HARBOR_USER }}
-#      harbor_secret: ${{ secrets.HARBOR_SECRET }}
+  manifest:
+    needs: [build]
+    uses: ./.github/workflows/manifest.yml
+    strategy:
+      matrix:
+        unikernel: [ httpreply ]
+        hypervisor: [ qemu, fc]
+    with:
+      unikernel: ${{ matrix.unikernel }}
+      hypervisor: ${{ matrix.hypervisor }}
+    secrets:
+      harbor_user: ${{ secrets.HARBOR_USER }}
+      harbor_secret: ${{ secrets.HARBOR_SECRET }}
+      cosign_private_key: ${{ secrets.COSIGN_PRIVATE_KEY }}
+      cosign_password: ${{ secrets.COSIGN_PASSWORD }}

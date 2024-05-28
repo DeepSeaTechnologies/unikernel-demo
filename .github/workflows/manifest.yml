@@ -14,6 +14,10 @@ on:
         required: true
       harbor_user:
         required: true
+      cosign_private_key:
+        required: true
+      cosign_password:
+        required: true  
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -22,16 +26,16 @@ permissions:
 
 jobs:
   manifest:
-    runs-on: [self-hosted ]
+    runs-on: ubuntu-latest
     steps:
 
     - name: Install Cosign
-      uses: sigstore/cosign-installer@v3.1.1
+      uses: sigstore/cosign-installer@v3.5.0
 
     - name: Login to Harbor
       uses: docker/login-action@v2
       with:
-        registry: harbor.nbfc.io/nubificus
+        registry: c8n.io/bmutziu
         username: ${{ secrets.harbor_user }}
         password: ${{ secrets.harbor_secret }}
 
@@ -40,23 +44,22 @@ jobs:
 
     - name: Create manifest
       run: |
-        TAGS=harbor.nbfc.io/nubificus/${{ inputs.unikernel }}-${{ inputs.hypervisor }}:latest
+        TAGS=c8n.io/bmutziu/${{ inputs.unikernel }}-${{ inputs.hypervisor }}:latest
         docker manifest rm $TAGS || true
         docker manifest create $TAGS \
-           --amend harbor.nbfc.io/nubificus/${{ inputs.unikernel }}-${{ inputs.hypervisor }}:x86_64 \
-           --amend harbor.nbfc.io/nubificus/${{ inputs.unikernel }}-${{ inputs.hypervisor }}:aarch64
+           --amend c8n.io/bmutziu/${{ inputs.unikernel }}-${{ inputs.hypervisor }}:x86_64
         HASH=$(docker manifest push $TAGS)
         echo "hash=$HASH" >> $GITHUB_ENV
         echo "tags=$TAGS" >> $GITHUB_ENV
 
-
     - name: Sign the published Docker image
       env:
-        COSIGN_EXPERIMENTAL: "true"
         DIGEST: ${{ env.hash }}
         TAGS: ${{ env.tags }}
+        COSIGN_PRIVATE_KEY: ${{ secrets.cosign_private_key }}
+        COSIGN_PASSWORD: ${{ secrets.cosign_password }}
       run: |
-        cosign sign --yes harbor.nbfc.io/nubificus/${{ inputs.unikernel }}-${{ inputs.hypervisor }}@${{ env.DIGEST }} \
+        cosign sign --yes --key env://COSIGN_PRIVATE_KEY c8n.io/bmutziu/${{ inputs.unikernel }}-${{ inputs.hypervisor }}:x86_64@${{ env.DIGEST }} \
         -a "repo=${{github.repository}}" \
         -a "workflow=${{github.workflow}}" \
         -a "ref=${{github.sha}}" \
