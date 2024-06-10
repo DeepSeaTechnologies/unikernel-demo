@@ -15,7 +15,7 @@ vpc:
   publicAccessCIDRs: ["213.233.88.0/24", "213.233.88.150/32"]  
 nodeGroups:
   - name: nonmanaged-ng-test-1
-    instanceType: m5.xlarge
+    instanceType: c5.metal
     amiFamily: Ubuntu2204
     ami: ami-053f81caf652e695c
     overrideBootstrapCommand: |

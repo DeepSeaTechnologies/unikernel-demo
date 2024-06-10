@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: app-httpreply-urunc
+  name: app-httpreply-urunc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: app-httpreply-urunc
+  template:
+    metadata:
+      labels:
+        run: app-httpreply-urunc
+    spec:
+      runtimeClassName: urunc
+      containers:
+      - image: c8n.io/bmutziu/httpreply-qemu:x86_64
+        imagePullPolicy: Always
+        name: app-httpreply-urunc
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 10m
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-httpreply-urunc
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    run: app-httpreply-urunc
+  sessionAffinity: None
+  type: ClusterIP
