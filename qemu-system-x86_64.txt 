@@ -1,0 +1,15 @@
+qemu-system-x86_64 -append netdev.ip=172.44.0.2/24:172.44.0.1 netdev.ip=172.44.0.2/24:172.44.0.1::::
+--
+
+-cpu qemu64,+pdpe1gb,-vmx,-svm -daemonize
+
+-device virtio-net-pci,mac=02:b0:b0:be:db:01,netdev=hostnet0
+-device virtio-net-pci,mac=02:b0:b0:a3:d3:01,netdev=hostnet1
+
+-device pvpanic -device sga -display none -kernel /home/ubuntu/work/httpreply/.unikraft/build/httpreply_qemu-x86_64 -machine pc -m size=244M -monitor unix:/root/.local/share/kraftkit/runtime/9c94e7f9-7cbc-4126-8082-79cf4173974c/qemu_mon.sock,server,nowait -name 9c94e7f9-7cbc-4126-8082-79cf4173974c 
+
+-netdev tap,id=hostnet0,ifname=virbr0@if0,script=no,downscript=no,br=virbr0
+-netdev user,id=hostnet1,hostfwd=tcp::8123-:8123 -nographic -no-reboot -S -parallel none
+-pidfile /root/.local/share/kraftkit/runtime/9c94e7f9-7cbc-4126-8082-79cf4173974c/machine.pid
+-qmp unix:/root/.local/share/kraftkit/runtime/9c94e7f9-7cbc-4126-8082-79cf4173974c/qemu_control.sock,server,nowait -qmp unix:/root/.local/share/kraftkit/runtime/9c94e7f9-7cbc-4126-8082-79cf4173974c/qemu_events.sock,server,nowait 
+-rtc base=utc -serial file:/root/.local/share/kraftkit/runtime/9c94e7f9-7cbc-4126-8082-79cf4173974c/machine.log -smp cpus=1,threads=1,sockets=1 -vga none

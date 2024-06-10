@@ -1,0 +1,210 @@
+    1  dplg -l containerd
+    2  dpkg -l containerd
+    3  sudo apt update
+    4  apt-get install -y locales
+    5  sudo apt-get install -y locales
+    6  locale-gen en_US en_US.UTF-8
+    7  sudo su -
+    8  top -i
+    9  sudo su -
+   10  sudo apt install -y --no-install-recommends   build-essential   sudo   gcc-aarch64-linux-gnu   libncurses-dev   libyaml-dev   flex   bison   git   wget   uuid-runtime   qemu-kvm   qemu-system-x86   qemu-system-arm   sgabios
+   11  sudo apt update && sudo apt install -y bison flex unzip
+   12  sudo apt-get install git wget bc make build-essential -y
+   13  wget -q https://go.dev/dl/go1.20.14.linux-$(dpkg --print-architecture).tar.gz
+   14  sudo rm -rf /usr/local/go
+   15  sudo tar -C /usr/local -xzf go1.20.14.linux-$(dpkg --print-architecture).tar.gz
+   16  sudo tee -a /etc/profile > /dev/null << 'EOT'
+   17  export PATH=$PATH:/usr/local/go/bin
+   18  EOT
+   19  rm -f go1.20.14.linux-$(dpkg --print-architecture).tar.gz
+   20  go version
+   21  which runc
+   22  dpkg -l container
+   23  dpkg -L containerd
+   24  which runc
+   25  dpkg -S /usr/sbin/runc 
+   26  dpkg -L runc
+   27  sudo apt remove runc
+   28  sudo apt remove containerd
+   29  sudo reboot
+   30  ps auxww
+   31  categorize_processes() {     while read -r line; do         if [[ $line =~ \[[^]]+\] ]]; then             echo "[Bracketed] $line";         elif [[ $line =~ / ]]; then             echo "[Slash-starting] $line";         elif [[ $line =~ sshd: ]]; then             echo "[Program] $line";         else             echo "[Other] $line";         fi;     done; }
+   32  # Get the ps auxww output and pass it to the categorize_processes function
+   33  ps auxww | categorize_processes
+   34  categorize_processes() {     while read -r line; do         if [[ $line =~ \[[^]]+\] ]]; then             echo "[Bracketed] $line";         elif [[ $line =~ ^/ ]]; then             echo "[Slash-starting] $line";         elif [[ $line =~ sshd: ]]; then             echo "[Program] $line";         else             echo "[Other] $line";         fi;     done; }
+   35  ps auxww | categorize_processes
+   36  ps auxww | categorize_processes | grep -iv bracketed
+   37  categorize_processes() {     while read -r line; do         if [[ $line =~ \[[^]]+\] ]]; then             echo "[Bracketed] $line";         elif [[ $line =~ / ]]; then             echo "[Slash-starting] $line";         elif [[ $line =~ sshd: ]]; then             echo "[Program] $line";         else             echo "[Other] $line";         fi;     done; }
+   38  ps auxww | categorize_processes | grep -iv bracketed
+   39  # Function to categorize processes
+   40  categorize_processes() {     while read -r line; do         if [[ $line =~ \[[^]]+\] ]]; then             echo "[Bracketed] $line";         elif [[ $line =~ /.*?/.*?/ ]]; then             echo "[Slash-starting] $line";         elif [[ $line =~ sshd: ]]; then             echo "[Program] $line";         else             echo "[Other] $line";         fi;     done; }
+   41  # Function to categorize processes
+   42  ps auxww | categorize_processes | grep -iv bracketed
+   43  ps auxww | categorize_processes | grep -i program
+   44  ps auxww | grep ssh
+   45  ps auxww | categorize_processes | grep -i ssh
+   46  ps auxww | categorize_processes | grep -Eiv \(bracketed|program\)
+   47  ps auxww | categorize_processes | grep -Eiv \(bracketed\|program\)
+   48  ps auxww | categorize_processes | grep -i other
+   49  ps auxww | categorize_processes | grep -Eiv \(bracketed\|program\|other\)
+   50  tail -f /var/log/
+   51  directory=/var/log
+   52  find "$directory" -type f -mmin -5
+   53  sudo find "$directory" -type f -mmin -5
+   54  tail -f /var/log/journal/ec23d83fd2ffbeabc14b6bba4eb036d9/user-1000.journal
+   55  tail -f /var/log/journal/ec23d83fd2ffbeabc14b6bba4eb036d9/system.journal 
+   56  sudo journalctl -f
+   57  sudo journalctl -f|grep -iv info
+   58  which runc
+   59  RUNC_VERSION=$(curl -L -s -o /dev/null -w '%{url_effective}' "https://github.com/opencontainers/runc/releases/latest" | grep -oP "v\d+\.\d+\.\d+" | sed 's/v//')
+   60  wget -q https://github.com/opencontainers/runc/releases/download/v$RUNC_VERSION/runc.$(dpkg --print-architecture)
+   61  sudo install -m 755 runc.$(dpkg --print-architecture) /usr/local/sbin/runc
+   62  rm -f ./runc.$(dpkg --print-architecture)
+   63  which runc
+   64  runc version
+   65  runc --version
+   66  CONTAINERD_VERSION=$(curl -L -s -o /dev/null -w '%{url_effective}' "https://github.com/containerd/containerd/releases/latest" | grep -oP "v\d+\.\d+\.\d+" | sed 's/v//')
+   67  wget -q https://github.com/containerd/containerd/releases/download/v$CONTAINERD_VERSION/containerd-$CONTAINERD_VERSION-linux-$(dpkg --print-architecture).tar.gz
+   68  sudo tar Cxzvf /usr/local containerd-$CONTAINERD_VERSION-linux-$(dpkg --print-architecture).tar.gz
+   69  sudo rm -f containerd-$CONTAINERD_VERSION-linux-$(dpkg --print-architecture).tar.gz
+   70  l
+   71  CONTAINERD_VERSION=$(curl -L -s -o /dev/null -w '%{url_effective}' "https://github.com/containerd/containerd/releases/latest" | grep -oP "v\d+\.\d+\.\d+" | sed 's/v//')
+   72  wget -q https://raw.githubusercontent.com/containerd/containerd/v$CONTAINERD_VERSION/containerd.service
+   73  sudo rm -f /lib/systemd/system/containerd.service
+   74  sudo mv containerd.service /lib/systemd/system/containerd.service
+   75  sudo systemctl daemon-reload
+   76  sudo systemctl enable --now containerd
+   77  alias l='ls -lacrt'
+   78  l /lib/systemd/system/containerd.service
+   79  cat /lib/systemd/system/containerd.service
+   80  sudo systemctl unmask containerd
+   81  CONTAINERD_VERSION=$(curl -L -s -o /dev/null -w '%{url_effective}' "https://github.com/containerd/containerd/releases/latest" | grep -oP "v\d+\.\d+\.\d+" | sed 's/v//')
+   82  wget -q https://raw.githubusercontent.com/containerd/containerd/v$CONTAINERD_VERSION/containerd.service
+   83  sudo rm -f /lib/systemd/system/containerd.service
+   84  sudo mv containerd.service /lib/systemd/system/containerd.service
+   85  sudo systemctl daemon-reload
+   86  sudo systemctl enable --now containerd
+   87  sudo mkdir -p /etc/containerd/
+   88  sudo mv /etc/containerd/config.toml /etc/containerd/config.toml.bak
+   89  sudo containerd config default | sudo tee /etc/containerd/config.toml
+   90  sudo systemctl restart containerd
+   91  ps auxww|grep cni
+   92  CNI_VERSION=$(curl -L -s -o /dev/null -w '%{url_effective}' "https://github.com/containernetworking/plugins/releases/latest" | grep -oP "v\d+\.\d+\.\d+" | sed 's/v//')
+   93  wget -q https://github.com/containernetworking/plugins/releases/download/v$CNI_VERSION/cni-plugins-linux-$(dpkg --print-architecture)-v$CNI_VERSION.tgz
+   94  sudo mkdir -p /opt/cni/bin
+   95  sudo tar Cxzvf /opt/cni/bin cni-plugins-linux-$(dpkg --print-architecture)-v$CNI_VERSION.tgz
+   96  sudo rm -f cni-plugins-linux-$(dpkg --print-architecture)-v$CNI_VERSION.tgz
+   97  NERDCTL_VERSION=$(curl -L -s -o /dev/null -w '%{url_effective}' "https://github.com/containerd/nerdctl/releases/latest" | grep -oP "v\d+\.\d+\.\d+" | sed 's/v//')
+   98  wget -q https://github.com/containerd/nerdctl/releases/download/v$NERDCTL_VERSION/nerdctl-$NERDCTL_VERSION-linux-$(dpkg --print-architecture).tar.gz
+   99  sudo tar Cxzvf /usr/local/bin nerdctl-$NERDCTL_VERSION-linux-$(dpkg --print-architecture).tar.gz
+  100  sudo rm -f nerdctl-$NERDCTL_VERSION-linux-$(dpkg --print-architecture).tar.gz
+  101  sudo mkdir -p /usr/local/bin/scripts
+  102  git clone https://github.com/nubificus/urunc.git
+  103  sudo cp urunc/script/dm_create.sh /usr/local/bin/scripts/dm_create.sh
+  104  sudo chmod 755 /usr/local/bin/scripts/dm_create.sh
+  105  sudo cp urunc/script/dm_reload.sh /usr/local/bin/scripts/dm_reload.sh
+  106  sudo chmod 755 /usr/local/bin/scripts/dm_reload.sh
+  107  sudo mkdir -p /usr/local/lib/systemd/system/
+  108  sudo cp urunc/script/dm_reload.service /usr/local/lib/systemd/system/dm_reload.service
+  109  sudo chmod 644 /usr/local/lib/systemd/system/dm_reload.service
+  110  sudo chown root:root /usr/local/lib/systemd/system/dm_reload.service
+  111  sudo systemctl daemon-reload
+  112  sudo systemctl enable dm_reload.service
+  113  sudo sed -i '/\[plugins\."io\.containerd\.snapshotter\.v1\.devmapper"\]/,/^$/d' /etc/containerd/config.toml
+  114  sudo tee -a /etc/containerd/config.toml > /dev/null <<'EOT'
+  115  # Customizations for urunc
+  116  [plugins."io.containerd.snapshotter.v1.devmapper"]
+  117    pool_name = "containerd-pool"
+  118    root_path = "/var/lib/containerd/io.containerd.snapshotter.v1.devmapper"
+  119    base_image_size = "10GB"
+  120    discard_blocks = true
+  121    fs_type = "ext2"
+  122  EOT
+  123  sudo systemctl restart containerd
+  124  cat /etc/containerd/config.toml
+  125  sudo /usr/local/bin/scripts/dm_create.sh
+  126  dmsetup ls
+  127  sudo dmsetup ls
+  128  sudo dmsetup status
+  129  sudo dmsetup info
+  130  sudo dmsetup table
+  131  #!/bin/bash
+  132  # List all device mapper devices
+  133  devices=$(sudo dmsetup ls --target multipath --exec 'dmsetup info -c --noheadings --separator , -o name')
+  134  # Loop through each device and display detailed info
+  135  for device in $devices; do     echo "Device: $device";     sudo dmsetup info $device;     echo ""; done
+  136  git clone git@github.com:nubificus/bima.git
+  137  cd bima
+  138  make && sudo make install
+  139  cd ..
+  140  cd -
+  141  l
+  142  git clone https://github.com/nubificus/bima.git
+  143  cd bima
+  144  make && sudo make install
+  145  cd ..
+  146  alias l='ls -lacrt'
+  147  l
+  148  l urunc/
+  149  cd urunc
+  150  make && sudo make install
+  151  cd ..
+  152  which urunc
+  153  urunc version
+  154  urunc --version
+  155  bima version
+  156  sudo tee -a /etc/containerd/config.toml > /dev/null <<EOT
+  157  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.urunc]
+  158      runtime_type = "io.containerd.urunc.v2"
+  159      container_annotations = ["com.urunc.unikernel.*"]
+  160      pod_annotations = ["com.urunc.unikernel.*"]
+  161      snapshotter = "devmapper"
+  162  EOT
+  163  sudo systemctl restart containerd
+  164  cat /etc/containerd/config.toml
+  165  sudo apt-get install libseccomp-dev pkg-config gcc -y
+  166  git clone -b v0.6.9 https://github.com/Solo5/solo5.git
+  167  cd solo5
+  168  ./configure.sh  && make -j$(nproc)
+  169  sudo cp tenders/hvt/solo5-hvt /usr/local/bin
+  170  sudo cp tenders/spt/solo5-spt /usr/local/bin
+  171  sudo reboot
+  172  sudo nerdctl run --rm -ti --snapshotter devmapper --runtime io.containerd.urunc.v2 harbor.nbfc.io/nubificus/urunc/redis-hvt-rump:latest unikernel
+  173  nvim 
+  174  vim /etc/containerd/config.toml
+  175  vi /etc/containerd/config.toml
+  176  sudo apt install nvim
+  177  snap install nvim --classical
+  178  snap install nvim --classic
+  179  sudo snap install nvim --classic
+  180  nvim /etc/containerd/config.toml
+  181  sudo nvim /etc/containerd/config.toml
+  182  cat /etc/containerd/config.toml
+  183  sudo nvim /etc/containerd/config.toml
+  184  sudo systemctl restart containerd
+  185  ps auxww|grep -i containerd
+  186  sudo systemctl stop containerd
+  187  ps auxww|grep -i containerd
+  188  sudo pkill -f /usr/local/bin/containerd-shim-runc-v2
+  189  ps auxww|grep -i containerd
+  190  sudo systemctl start containerd
+  191  ps auxww|grep -i containerd
+  192  sudo apt-get install qemu-kvm -y
+  193  sudo nerdctl run --rm -ti --runtime io.containerd.urunc.v2 harbor.nbfc.io/nubificus/urunc/nginx-qemu-unikraft:latest unikernel
+  194  ps auxww|grep -i containerd
+  195  ps auxww|grep -i containerd|grep -iv grep
+  196  ps auxww|grep -i containerd|grep -Eiv "(grep|snap)"
+  197  ARCH="$(uname -m)"
+  198  release_url="https://github.com/firecracker-microvm/firecracker/releases"
+  199  latest=$(basename $(curl -fsSLI -o /dev/null -w %{url_effective} ${release_url}/latest))
+  200  curl -L ${release_url}/download/${latest}/firecracker-${latest}-${ARCH}.tgz | tar -xz
+  201  # Rename the binary to "firecracker"
+  202  sudo mv release-${latest}-$(uname -m)/firecracker-${latest}-${ARCH} /usr/local/bin/firecracker
+  203  rm -fr release-${latest}-$(uname -m)
+  204  l
+  205  firecracker version
+  206  firecracker --version
+  207  sudo nerdctl run --rm -ti --runtime io.containerd.urunc.v2 harbor.nbfc.io/nubificus/urunc/nginx-fc-unik:latest unikernel
+  208  nerdctl images
+  209  sudo nerdctl images
+  210  history > history.log
