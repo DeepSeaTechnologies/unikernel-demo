@@ -9,7 +9,7 @@ metadata:
   version: "1.30"
 nodeGroups:
   - name: nonmanaged-ng-test-1
-    instanceType: m5.xlarge
+    instanceType: c5.metal
     amiFamily: Ubuntu2204
     ami: ami-053f81caf652e695c
     maxPodsPerNode: 100  
