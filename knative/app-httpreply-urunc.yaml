@@ -1,0 +1,13 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: app-httpreply-urunc
+spec:
+  template:
+    metadata:
+      annotations:
+        cni.projectcalico.org/ipAddrs: "[\"10.173.112.97\"]"
+    spec:
+      runtimeClassName: urunc
+      containers:
+        - image: c8n.io/bmutziu/httpreply-qemu:x86_64
